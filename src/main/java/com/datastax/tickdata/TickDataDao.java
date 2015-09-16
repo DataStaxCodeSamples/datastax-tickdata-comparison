@@ -143,8 +143,6 @@ public class TickDataDao {
 		BoundStatement boundStmt = new BoundStatement(this.insertStmtTick);
 		List<ResultSetFuture> results = new ArrayList<ResultSetFuture>();
 		
-		logger.info("Inserting for TickData");
-		
 		for (TickData tickData : list) {
 			
 			DateTime dateTime = tickData.getTime() != null ? tickData.getTime() : DateTime.now();
@@ -154,7 +152,7 @@ public class TickDataDao {
 			boundStmt.setDouble(2, tickData.getValue());
 
 			results.add(session.executeAsync(boundStmt));
-			
+						
 			TOTAL_POINTS.incrementAndGet();			
 		}
 				

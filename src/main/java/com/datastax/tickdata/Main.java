@@ -166,6 +166,9 @@ public class Main {
 				
 				tickDataList.add(new TickData(symbol, values[i], new DateTime(dates[i])));
 			}
+			
+			logger.info("Writing TickData - " + symbol + " - " + tickDataList.size());
+			
 			return tickDataList;
 		}
 	}

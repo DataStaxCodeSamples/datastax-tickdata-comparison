@@ -49,7 +49,7 @@ public class TickGenerator implements Iterator<TimeSeries> {
 			
 			startPrice = this.createRandomValue(startPrice);
 			
-			today = today.plusMillis(new Double(Math.random() * 500).intValue());			
+			today = today.plusMillis(new Double(Math.random() * 500).intValue() + 1);			
 		}
 		counter ++;
 		
