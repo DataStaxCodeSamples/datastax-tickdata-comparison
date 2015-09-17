@@ -19,7 +19,7 @@ public class DataLoader {
 
 	private static Logger logger = LoggerFactory.getLogger(DataLoader.class);
 	
-	private static final CharSequence EXCHANGEDATA = "exchangedata";
+	private static final CharSequence EXCHANGEDATA = "small_exchangedata";
 
 	public DataLoader(){}
 

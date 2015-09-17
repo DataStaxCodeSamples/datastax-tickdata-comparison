@@ -7,56 +7,83 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.colt.list.DoubleArrayList;
 import cern.colt.list.LongArrayList;
 
+import com.datastax.tickdata.Main;
 import com.datastax.timeseries.utils.TimeSeries;
 
 public class TickGenerator implements Iterator<TimeSeries> {
-	
+
 	private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-	
+	private static Logger logger = LoggerFactory.getLogger(TickGenerator.class);
 	private int counter = 0;
 	private List<String> exchangeSymbols;
 	private AtomicLong tickCounter = new AtomicLong(0);
+	private DateTime startDateTime;
 
-	public TickGenerator(List<String> exchangeSymbols) {
+	public TickGenerator(List<String> exchangeSymbols, DateTime startTime) {
 		this.exchangeSymbols = exchangeSymbols;
+		this.startDateTime = startTime;
 	}
 
 	@Override
 	public boolean hasNext() {
-		//return counter < this.exchangeSymbols.size();
-		return counter < 25;
+		
+		
+		if (counter < this.exchangeSymbols.size()){
+			return true;
+		}else{
+			logger.info("Comparing : " + this.startDateTime + " - " + new DateTime());
+			if (this.startDateTime.getMillis() < new DateTime().getMillis()){
+				
+				startDateTime = startDateTime.plusDays(1);
+				counter = 0;
+				
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				return true;
+			}else{			
+				return false;
+			}
+		}
 	}
 
 	@Override
 	public TimeSeries next() {
 		String exchangeSymbol = exchangeSymbols.get(counter);
-		
-		DateTime today = new DateTime().withHourOfDay(8).withMinuteOfHour(0).withSecondOfMinute(0);
-		DateTime endTime = new DateTime().withHourOfDay(16).withMinuteOfHour(30).withSecondOfMinute(0);
-				
+
+		DateTime today = startDateTime.withHourOfDay(8).withMinuteOfHour(0).withSecondOfMinute(0);
+		DateTime endTime = startDateTime.withHourOfDay(16).withMinuteOfHour(30).withSecondOfMinute(0);
+
 		LongArrayList dates = new LongArrayList();
 		DoubleArrayList prices = new DoubleArrayList();
-		double startPrice = Math.random()*1000;
-		
-		while (today.isBefore(endTime.getMillis())){
-			
+		double startPrice = Math.random() * 1000;
+
+		while (today.isBefore(endTime.getMillis())) {
+
 			dates.add(today.getMillis());
 			prices.add(startPrice);
-			
+
 			startPrice = this.createRandomValue(startPrice);
-			
-			today = today.plusMillis(new Double(Math.random() * 500).intValue() + 1);			
+
+			today = today.plusMillis(new Double(Math.random() * 500).intValue() + 1);
 		}
-		counter ++;
-		
+		counter++;
+
 		dates.trimToSize();
 		prices.trimToSize();
-		
-		return new TimeSeries(exchangeSymbol + "-" + formatter.format(today.toDate()), dates.elements(), prices.elements());
+
+		return new TimeSeries(exchangeSymbol + "-" + formatter.format(today.toDate()), dates.elements(),
+				prices.elements());
 	}
 
 	@Override
@@ -76,11 +103,11 @@ public class TickGenerator implements Iterator<TimeSeries> {
 		}
 
 		tickCounter.incrementAndGet();
-		
+
 		return lastValue;
 	}
 
-	public long getCount(){
+	public long getCount() {
 		return this.tickCounter.get();
 	}
 }

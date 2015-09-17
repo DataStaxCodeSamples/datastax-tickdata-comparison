@@ -31,15 +31,26 @@ public class Main {
 
 		String contactPointsStr = PropertyHelper.getProperty("contactPoints", "localhost");
 		String noOfThreadsStr = PropertyHelper.getProperty("noOfThreads", "1");
+		String noOfDaysStr = PropertyHelper.getProperty("noOfDays", "2");
+		String typeStr = PropertyHelper.getProperty("type", "binary");
 		
+		boolean binary = true;
+		if (!typeStr.equalsIgnoreCase("binary")){
+			binary = false;
+		}
 		
+		int noOfDays = Integer.parseInt(noOfDaysStr);
+		DateTime startTime = new DateTime().minusDays(noOfDays - 1);
+		
+		logger.info("StartTime : " + startTime);
+				
 		TickDataBinaryDao binaryDao = new TickDataBinaryDao(contactPointsStr.split(","));
 		TickDataDao dao = new TickDataDao(contactPointsStr.split(","));
 		
 		int noOfThreads = Integer.parseInt(noOfThreadsStr);
 		//Create shared queue 
-		BlockingQueue<TimeSeries> binaryQueue = new ArrayBlockingQueue<TimeSeries>(1000);
-		BlockingQueue<TimeSeries> queue = new ArrayBlockingQueue<TimeSeries>(1000);
+		BlockingQueue<TimeSeries> binaryQueue = new ArrayBlockingQueue<TimeSeries>(100);
+		BlockingQueue<TimeSeries> queue = new ArrayBlockingQueue<TimeSeries>(100);
 		
 		//Executor for Threads
 		ExecutorService binaryExecutor = Executors.newFixedThreadPool(noOfThreads);
@@ -57,15 +68,20 @@ public class Main {
 		DataLoader dataLoader = new DataLoader ();
 		List<String> exchangeSymbols = dataLoader.getExchangeData();
 		
+		logger.info("No of symbols : " + exchangeSymbols.size());
+		
 		//Start the tick generator
-		TickGenerator tickGenerator = new TickGenerator(exchangeSymbols);
+		TickGenerator tickGenerator = new TickGenerator(exchangeSymbols, startTime);
 		
 		while (tickGenerator.hasNext()){
 			TimeSeries next = tickGenerator.next();
 			
 			try {
-				queue.put(next);
-				binaryQueue.put(next);
+				if (binary){				
+					binaryQueue.put(next);
+				}else{
+					queue.put(next);
+				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -77,10 +93,10 @@ public class Main {
 		}		
 				
 		if (binaryTotal.get() > 0){
-			logger.info("Data Loading (" + tickGenerator.getCount() + " ticks) for binary took " + binaryTotal.get()+ "ms (" + decimalFormat.format(new Double(tickGenerator.getCount()*1000)/(new Double(binaryTotal.get()).doubleValue())) + " a sec)");
+			logger.info("Data Loading (" + decimalFormat.format(tickGenerator.getCount()) + " ticks) for binary took " + binaryTotal.get()+ "ms (" + decimalFormat.format(new Double(tickGenerator.getCount()*1000)/(new Double(binaryTotal.get()).doubleValue())) + " a sec)");
 		}
 		if (tickTotal.get() > 0){
-			logger.info("Data Loading (" + tickGenerator.getCount() + " ticks) for tick took " + tickTotal.get()+ "ms (" + decimalFormat.format(new Double(tickGenerator.getCount()*1000)/(new Double(tickTotal.get()).doubleValue())) + " a sec)");
+			logger.info("Data Loading (" + decimalFormat.format(tickGenerator.getCount()) + " ticks) for tick took " + tickTotal.get()+ "ms (" + decimalFormat.format(new Double(tickGenerator.getCount()*1000)/(new Double(tickTotal.get()).doubleValue())) + " a sec)");
 		}	
 		
 		System.exit(0);

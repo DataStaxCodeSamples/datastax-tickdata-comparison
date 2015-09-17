@@ -55,12 +55,13 @@ public class TickDataDao {
 	private PreparedStatement insertStmtTick;
 	private PreparedStatement selectStmtTick;
 	private PreparedStatement selectRangeStmtTick;
+	private Cluster cluster;
 	
 	private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.zzz"); 
 
 	public TickDataDao(String[] contactPoints) {
 
-		final Cluster cluster = Cluster.builder()
+		cluster = Cluster.builder()
 				.addContactPoints(contactPoints)
 				.build();
 
@@ -162,17 +163,17 @@ public class TickDataDao {
 		return;
 	}
 	
-	public void selectAllHistoricData(int fetchSize){
-		Statement stmt = new SimpleStatement(SELECT_ALL);
+	/*public void selectAllHistoricData(int fetchSize){
+		Statement stmt = new SimpleStatement(SELECT_ALL, cluster, null);
 		stmt.setFetchSize(fetchSize);
-		ResultSet rs = session.execute(stmt);
+		ResultSet rs = session.execute(SELECT_ALL);
 		
 		Iterator<Row> iterator = rs.iterator();
 		
 		while (iterator.hasNext()){
 			iterator.next().getDouble("value");
 		}		
-	}
+	}*/
 
 	private String fillNumber(int num) {
 		return num < 10 ? "0" + num : "" + num;
