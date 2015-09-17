@@ -69,7 +69,7 @@ public class TickDataDao {
 		this.session = cluster.connect();
 
 		this.insertStmtTick = session.prepare(INSERT_INTO_TICK);		
-		this.insertStmtTick.setConsistencyLevel(ConsistencyLevel.ONE);
+		this.insertStmtTick.setConsistencyLevel(ConsistencyLevel.QUORUM);
 		this.selectStmtTick = session.prepare(SELECT_FROM_TICK);		
 		this.selectStmtTick.setConsistencyLevel(ConsistencyLevel.ONE);
 		this.selectRangeStmtTick = session.prepare(SELECT_FROM_TICK_RANGE);		

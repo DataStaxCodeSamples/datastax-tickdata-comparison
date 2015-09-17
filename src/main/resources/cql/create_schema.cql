@@ -19,5 +19,6 @@ CREATE TABLE if not exists tick_data (
 	date timestamp,
 	value double,
 	PRIMARY KEY (symbol, date)
-) WITH CLUSTERING ORDER BY (date DESC)
+) WITH CLUSTERING ORDER BY (date DESC);
+	
 truncate tick_data;
