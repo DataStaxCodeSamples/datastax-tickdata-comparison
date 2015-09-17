@@ -66,7 +66,7 @@ public class TickGenerator implements Iterator<TimeSeries> {
 
 		LongArrayList dates = new LongArrayList();
 		DoubleArrayList prices = new DoubleArrayList();
-		double startPrice = Math.random() * 1000;
+		double startPrice = exchangeSymbol.hashCode();
 
 		while (today.isBefore(endTime.getMillis())) {
 
