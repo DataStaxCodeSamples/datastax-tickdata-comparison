@@ -35,11 +35,8 @@ public class Read {
 		timer.end();
 		logger.info("Data read took with tick " + timer.getTimeTakenMillis() + " ms. Total Points " + tickData.getDates().length);
 		
-		
-		
 		System.exit(0);
 	}
-
 	
 	/**
 	 * @param args

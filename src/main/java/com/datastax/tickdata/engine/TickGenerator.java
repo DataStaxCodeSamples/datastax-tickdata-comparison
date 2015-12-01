@@ -32,8 +32,6 @@ public class TickGenerator implements Iterator<TimeSeries> {
 
 	@Override
 	public boolean hasNext() {
-		
-		
 		if (counter < this.exchangeSymbols.size()){
 			return true;
 		}else{
@@ -66,7 +64,7 @@ public class TickGenerator implements Iterator<TimeSeries> {
 
 		LongArrayList dates = new LongArrayList();
 		DoubleArrayList prices = new DoubleArrayList();
-		double startPrice = exchangeSymbol.hashCode();
+		double startPrice = exchangeSymbol.hashCode() % 1000;
 
 		while (today.isBefore(endTime.getMillis())) {
 
