@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.datastax.demo.utils.PropertyHelper;
 import com.datastax.demo.utils.Timer;
-import com.datastax.timeseries.utils.TimeSeries;
+import com.datastax.timeseries.model.TimeSeries;
 
 public class SymbolReader {
 	private static Logger logger = LoggerFactory.getLogger(SymbolReader.class);

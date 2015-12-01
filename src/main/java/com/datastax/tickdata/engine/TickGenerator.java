@@ -13,8 +13,7 @@ import org.slf4j.LoggerFactory;
 import cern.colt.list.DoubleArrayList;
 import cern.colt.list.LongArrayList;
 
-import com.datastax.tickdata.Main;
-import com.datastax.timeseries.utils.TimeSeries;
+import com.datastax.timeseries.model.TimeSeries;
 
 public class TickGenerator implements Iterator<TimeSeries> {
 

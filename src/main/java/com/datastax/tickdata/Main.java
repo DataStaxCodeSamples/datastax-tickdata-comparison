@@ -17,7 +17,7 @@ import com.datastax.demo.utils.PropertyHelper;
 import com.datastax.demo.utils.Timer;
 import com.datastax.tickdata.engine.TickGenerator;
 import com.datastax.tickdata.model.TickData;
-import com.datastax.timeseries.utils.TimeSeries;
+import com.datastax.timeseries.model.TimeSeries;
 
 public class Main {
 	private static Logger logger = LoggerFactory.getLogger(Main.class);

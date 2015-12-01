@@ -1,13 +1,11 @@
 package com.datastax.tickdata;
 
-import java.util.concurrent.BlockingQueue;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.datastax.demo.utils.PropertyHelper;
 import com.datastax.demo.utils.Timer;
-import com.datastax.timeseries.utils.TimeSeries;
+import com.datastax.timeseries.model.TimeSeries;
 
 public class Read {
 	private static Logger logger = LoggerFactory.getLogger(Read.class);

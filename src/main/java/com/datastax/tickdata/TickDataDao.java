@@ -3,13 +3,8 @@ package com.datastax.tickdata;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.joda.time.DateTime;
@@ -22,20 +17,16 @@ import cern.colt.list.LongArrayList;
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ConsistencyLevel;
-import com.datastax.driver.core.Host;
 import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.ResultSetFuture;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.datastax.driver.core.SimpleStatement;
-import com.datastax.driver.core.Statement;
-import com.datastax.driver.core.policies.LatencyAwarePolicy;
-import com.datastax.driver.core.policies.LatencyAwarePolicy.Snapshot;
-import com.datastax.driver.core.policies.LatencyAwarePolicy.Snapshot.Stats;
-import com.datastax.driver.core.policies.Policies;
+import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
+import com.datastax.driver.core.policies.DowngradingConsistencyRetryPolicy;
+import com.datastax.driver.core.policies.TokenAwarePolicy;
 import com.datastax.tickdata.model.TickData;
-import com.datastax.timeseries.utils.TimeSeries;
+import com.datastax.timeseries.model.TimeSeries;
 
 public class TickDataDao {
 	
@@ -62,8 +53,9 @@ public class TickDataDao {
 	public TickDataDao(String[] contactPoints) {
 
 		cluster = Cluster.builder()
-				.addContactPoints(contactPoints)
-				.build();
+				.withLoadBalancingPolicy(new TokenAwarePolicy(new DCAwareRoundRobinPolicy()))
+				.withRetryPolicy(DowngradingConsistencyRetryPolicy.INSTANCE)
+				.addContactPoints(contactPoints).build();
 
 		
 		this.session = cluster.connect();

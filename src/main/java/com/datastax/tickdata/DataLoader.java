@@ -13,8 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import au.com.bytecode.opencsv.CSVReader;
 
-import com.datastax.tickdata.model.TickData;
-
 public class DataLoader {
 
 	private static Logger logger = LoggerFactory.getLogger(DataLoader.class);

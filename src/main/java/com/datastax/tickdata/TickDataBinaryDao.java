@@ -4,8 +4,6 @@ import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.nio.LongBuffer;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +16,12 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.ResultSetFuture;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
+import com.datastax.driver.core.policies.DowngradingConsistencyRetryPolicy;
 import com.datastax.driver.core.policies.TokenAwarePolicy;
-import com.datastax.timeseries.utils.TimeSeries;
+import com.datastax.timeseries.model.TimeSeries;
 
 public class TickDataBinaryDao {
 	
@@ -45,6 +43,7 @@ public class TickDataBinaryDao {
 
 		Cluster cluster = Cluster.builder()
 				.withLoadBalancingPolicy(new TokenAwarePolicy(new DCAwareRoundRobinPolicy()))
+				.withRetryPolicy(DowngradingConsistencyRetryPolicy.INSTANCE)
 				.addContactPoints(contactPoints).build();
 		
 		this.session = cluster.connect();
@@ -52,7 +51,7 @@ public class TickDataBinaryDao {
 		this.insertStmtTick = session.prepare(INSERT_INTO_TICK);		
 		this.insertStmtTick.setConsistencyLevel(ConsistencyLevel.ONE);
 		this.selectStmtTick = session.prepare(SELECT_FROM_TICK);		
-		this.selectStmtTick.setConsistencyLevel(ConsistencyLevel.ONE);
+		this.selectStmtTick.setConsistencyLevel(ConsistencyLevel.QUORUM);
 	}
 	
 	public TimeSeries getTimeSeries(String symbol){
