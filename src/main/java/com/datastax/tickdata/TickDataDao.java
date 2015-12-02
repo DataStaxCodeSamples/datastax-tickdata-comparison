@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import cern.colt.list.DoubleArrayList;
 import cern.colt.list.LongArrayList;
 
+import com.datastax.demo.utils.PropertyHelper;
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ConsistencyLevel;
@@ -24,6 +25,7 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
 import com.datastax.driver.core.policies.DowngradingConsistencyRetryPolicy;
+import com.datastax.driver.core.policies.LoggingRetryPolicy;
 import com.datastax.driver.core.policies.TokenAwarePolicy;
 import com.datastax.tickdata.model.TickData;
 import com.datastax.timeseries.model.TimeSeries;
@@ -52,9 +54,12 @@ public class TickDataDao {
 
 	public TickDataDao(String[] contactPoints) {
 
+		String remoteDC = PropertyHelper.getProperty("remoteDC", "");
+		int replicasRemoteDC = Integer.parseInt(PropertyHelper.getProperty("replicasRemoteDC", "2"));
+		
 		cluster = Cluster.builder()
-				.withLoadBalancingPolicy(new TokenAwarePolicy(new DCAwareRoundRobinPolicy()))
-				.withRetryPolicy(DowngradingConsistencyRetryPolicy.INSTANCE)
+				.withLoadBalancingPolicy(new TokenAwarePolicy(new DCAwareRoundRobinPolicy(remoteDC, replicasRemoteDC)))
+				.withRetryPolicy(new LoggingRetryPolicy(DowngradingConsistencyRetryPolicy.INSTANCE))
 				.addContactPoints(contactPoints).build();
 
 		
