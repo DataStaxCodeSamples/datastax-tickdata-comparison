@@ -34,11 +34,16 @@ To create the a single node cluster with replication factor of 1 for standard lo
 
     mvn clean compile exec:java -Dexec.mainClass="com.datastax.demo.SchemaSetup"
 
-To run the insert
+To run the insert for binary run the following 
 
     mvn clean compile exec:java -Dexec.mainClass="com.datastax.tickdata.Main" (-DcontactPoints=<node0>)
 
-This will create 2 threads, 1 for binary inserts and 1 for tickdata inserts. 
+
+To run the insert for clusterd tick data  run the following 
+
+    mvn clean compile exec:java -Dexec.mainClass="com.datastax.tickdata.Main" -Dtype=tick (-DcontactPoints=<node0>)
+
+The default no of days of data is 20 but this can be changed by the adding the following -DnoOfDays=
 
 To read a ticker
 
