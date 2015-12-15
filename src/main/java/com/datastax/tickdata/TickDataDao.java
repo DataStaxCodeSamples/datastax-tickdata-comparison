@@ -3,6 +3,7 @@ package com.datastax.tickdata;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -23,10 +24,6 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.ResultSetFuture;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
-import com.datastax.driver.core.policies.DowngradingConsistencyRetryPolicy;
-import com.datastax.driver.core.policies.LoggingRetryPolicy;
-import com.datastax.driver.core.policies.TokenAwarePolicy;
 import com.datastax.tickdata.model.TickData;
 import com.datastax.timeseries.model.TimeSeries;
 
@@ -58,8 +55,6 @@ public class TickDataDao {
 		int replicasRemoteDC = Integer.parseInt(PropertyHelper.getProperty("replicasRemoteDC", "2"));
 		
 		cluster = Cluster.builder()
-				.withLoadBalancingPolicy(new TokenAwarePolicy(new DCAwareRoundRobinPolicy(remoteDC, replicasRemoteDC)))
-				.withRetryPolicy(new LoggingRetryPolicy(DowngradingConsistencyRetryPolicy.INSTANCE))
 				.addContactPoints(contactPoints).build();
 
 		
@@ -138,15 +133,15 @@ public class TickDataDao {
 	}
 
 	public void insertTickData(List<TickData> list) throws Exception{
-		BoundStatement boundStmt = new BoundStatement(this.insertStmtTick);
+		BoundStatement boundStmt;
 		List<ResultSetFuture> results = new ArrayList<ResultSetFuture>();
 		
 		for (TickData tickData : list) {
-			
+			boundStmt = new BoundStatement(this.insertStmtTick);
 			DateTime dateTime = tickData.getTime() != null ? tickData.getTime() : DateTime.now();
 						
 			boundStmt.setString(0, tickData.getKey());
-			boundStmt.setDate(1, new Timestamp(dateTime.getMillis()));
+			boundStmt.setDate(1, new Date(dateTime.getMillis()));
 			boundStmt.setDouble(2, tickData.getValue());
 
 			results.add(session.executeAsync(boundStmt));

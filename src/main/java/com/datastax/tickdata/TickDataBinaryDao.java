@@ -47,8 +47,6 @@ public class TickDataBinaryDao {
 		int replicasRemoteDC = Integer.parseInt(PropertyHelper.getProperty("replicasRemoteDC", "2"));
 		
 		Cluster cluster = Cluster.builder()
-				.withLoadBalancingPolicy(new TokenAwarePolicy(new DCAwareRoundRobinPolicy(remoteDC, replicasRemoteDC)))
-				.withRetryPolicy(new LoggingRetryPolicy(DowngradingConsistencyRetryPolicy.INSTANCE))
 				.addContactPoints(contactPoints).build();
 		
 		this.session = cluster.connect();
@@ -82,6 +80,9 @@ public class TickDataBinaryDao {
 		LongBuffer dates = row.getBytes("dates").asLongBuffer();		
 		DoubleBuffer ticks = row.getBytes("ticks").asDoubleBuffer();
 		
+		logger.info(dates +"");
+		logger.info(ticks +"");
+		
 		while (dates.hasRemaining()){
 			dateArray.add(dates.get());
 			valueArray.add(ticks.get());	
@@ -110,7 +111,7 @@ public class TickDataBinaryDao {
 			pricesBuffer.putDouble(values[i]);
 		}
 				
-		session.execute(boundStmt.bind(timeSeries.getSymbol(), datesBuffer.flip(), pricesBuffer.flip()));		
+		session.execute(boundStmt.bind(timeSeries.getSymbol(), datesBuffer.flip(), pricesBuffer.flip()));
 		
 		datesBuffer.clear();
 		pricesBuffer.clear();

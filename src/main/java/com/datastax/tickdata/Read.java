@@ -14,7 +14,7 @@ public class Read {
 	public Read() {
 
 		String contactPointsStr = PropertyHelper.getProperty("contactPoints", "localhost");
-		String symbol = PropertyHelper.getProperty("symbol", "NASDAQ-ABII-2015-09-16");
+		String symbol = PropertyHelper.getProperty("symbol", "NASDAQ-ACOR-2015-12-03");
 
 		TickDataBinaryDao binaryDao = new TickDataBinaryDao(contactPointsStr.split(","));
 		TickDataDao dao = new TickDataDao(contactPointsStr.split(","));

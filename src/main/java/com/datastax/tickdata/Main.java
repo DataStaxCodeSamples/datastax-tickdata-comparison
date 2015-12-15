@@ -31,7 +31,7 @@ public class Main {
 
 		String contactPointsStr = PropertyHelper.getProperty("contactPoints", "localhost");
 		String noOfThreadsStr = PropertyHelper.getProperty("noOfThreads", "1");
-		String noOfDaysStr = PropertyHelper.getProperty("noOfDays", "2");
+		String noOfDaysStr = PropertyHelper.getProperty("noOfDays", "20");
 		String typeStr = PropertyHelper.getProperty("type", "binary");
 		
 		boolean binary = true;
@@ -40,7 +40,7 @@ public class Main {
 		}
 		
 		int noOfDays = Integer.parseInt(noOfDaysStr);
-		DateTime startTime = new DateTime().minusDays(noOfDays - 1);
+		DateTime startTime = new DateTime().minusDays(noOfDays);
 		
 		logger.info("StartTime : " + startTime);
 				
